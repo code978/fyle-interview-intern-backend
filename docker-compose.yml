@@ -1,0 +1,9 @@
+# version: '3.8'  # Adjust the version if needed
+
+services:
+  app:
+    build: .  # Build the image from the current directory (./)
+    ports:
+      - "5000:5000"  # Map container port 5000 to host port 5000
+    volumes:
+      - .:/app  # Mount the current directory as a volume at /app within the container (for development)

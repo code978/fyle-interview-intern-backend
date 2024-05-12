@@ -1,4 +1,4 @@
-SELECT COUNT(*)
+SELECT assignment_count
 FROM (
     SELECT teacher_id, COUNT(*) AS assignment_count
     FROM assignments

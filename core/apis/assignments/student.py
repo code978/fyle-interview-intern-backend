@@ -26,7 +26,8 @@ def upsert_assignment(p, incoming_payload):
     content = incoming_payload.get('content')
     if content is None:
         print(f'content is None: {APIResponse.status_code}')
-        return APIResponse().respond(400)
+        return APIResponse.respond(400)  # Remove 'message' argument
+
         
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
