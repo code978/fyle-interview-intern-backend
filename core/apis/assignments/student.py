@@ -1,4 +1,5 @@
 from flask import Blueprint
+from marshmallow import ValidationError
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
@@ -22,27 +23,33 @@ def list_assignments(p):
 @decorators.authenticate_principal
 def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
+    content = incoming_payload.get('content')
+    if content is None:
+        return APIResponse.respond_error(400)
+
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
 
     upserted_assignment = Assignment.upsert(assignment)
     db.session.commit()
     upserted_assignment_dump = AssignmentSchema().dump(upserted_assignment)
-    return APIResponse.respond(data=upserted_assignment_dump)
-
+    return APIResponse().respond(data=upserted_assignment_dump)
 
 @student_assignments_resources.route('/assignments/submit', methods=['POST'], strict_slashes=False)
 @decorators.accept_payload
 @decorators.authenticate_principal
 def submit_assignment(p, incoming_payload):
     """Submit an assignment"""
-    submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
+    try:
+        submit_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
 
-    submitted_assignment = Assignment.submit(
-        _id=submit_assignment_payload.id,
-        teacher_id=submit_assignment_payload.teacher_id,
-        auth_principal=p
-    )
-    db.session.commit()
-    submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
-    return APIResponse.respond(data=submitted_assignment_dump)
+        submitted_assignment = Assignment.submit(
+            _id=submit_assignment_payload.id,
+            teacher_id=submit_assignment_payload.teacher_id,
+            auth_principal=p
+        )
+        db.session.commit()
+        submitted_assignment_dump = AssignmentSchema().dump(submitted_assignment)
+        return APIResponse.respond(data=submitted_assignment_dump)
+    except AssertionError as error:
+        return APIResponse.respond_error(error_code='FyleError', message=str(error))
