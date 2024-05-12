@@ -36,9 +36,6 @@ def test_post_assignment_null_content(client, h_student_1):
             'content': None
         })
 
-    print("test_post_assignment_null_content")
-    print(response.status_code)
-
     assert response.status_code == 400
 
 
