@@ -9,6 +9,9 @@ This document describes how to build and run your Flask application using Docker
 * A Flask application with a `requirements.txt` file.
 
 ## Building the Docker Image
+docker-compose build 
+
+docker images
 
 A Dockerfile defines the instructions to build a Docker image containing your application. Here's the provided Dockerfile:
 
