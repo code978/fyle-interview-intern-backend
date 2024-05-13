@@ -1,0 +1,17 @@
+# Exclude version control system files
+.git/
+.gitignore
+
+# Exclude temporary files and cache
+__pycache__
+*.pyc
+*.log
+*.tmp
+
+# Exclude development environment files (if not needed in production)
+.env  # Replace with your specific environment file name(s)
+requirements.txt
+tests/
+
+# Exclude large files or folders (consider mounting as volumes)
+assets/  # Replace with the path to your static assets directory (images, etc.)
