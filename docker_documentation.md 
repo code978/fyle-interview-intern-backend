@@ -1,0 +1,46 @@
+# Building and Running Flask Application with Docker
+
+This document describes how to build and run your Flask application using Docker.
+
+## Prerequisites
+
+* Docker installed on your system (https://www.docker.com/).
+* Basic understanding of Docker concepts (images, containers).
+* A Flask application with a `requirements.txt` file.
+
+## Building the Docker Image
+
+A Dockerfile defines the instructions to build a Docker image containing your application. Here's the provided Dockerfile:
+
+```dockerfile
+FROM python:3.8
+
+WORKDIR /core
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project code
+COPY . .
+
+# Install Gunicorn
+COPY gunicorn_config.py .
+
+# Set environment variable (optional, based on your use case)
+ENV FLASK_APP=core/server.py
+
+# Specify the entrypoint command
+CMD ["gunicorn", "-c", "gunicorn_config.py", "core.server:app"]
+
+
+**Explanation:**
+
+* This Dockerfile uses the `python:3.8` base image... 
+
+
+* Running the Application
+
+Development Mode (using Flask's built-in server)
+Bash
+docker run -p 7755:7755 --rm fyle-interview-intern-backend-app
