@@ -1,3 +1,13 @@
+from core.libs.assertions import (
+    base_assert,
+    assert_auth,
+    assert_true,
+    assert_valid,
+    assert_found
+)
+from core.libs.exceptions import FyleError
+import pytest
+
 def test_get_assignments_teacher_1(client, h_teacher_1):
     response = client.get(
         '/teacher/assignments',
@@ -99,3 +109,17 @@ def test_grade_assignment_draft_assignment(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'FyleError'
+
+
+
+def test_fyle_error_initialization():
+    error = FyleError(400, 'Test error message')
+    assert error.status_code == 400
+    assert error.message == 'Test error message'
+
+def test_fyle_error_to_dict():
+    error = FyleError(400, 'Test error message')
+    error_dict = error.to_dict()
+    assert isinstance(error_dict, dict)
+    assert 'message' in error_dict
+    assert error_dict['message'] == 'Test error message'

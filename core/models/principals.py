@@ -2,6 +2,8 @@ from core import db
 from core.libs import helpers
 from core.models.assignments import Assignment, AssignmentStateEnum
 from core.apis.decorators import AuthPrincipal
+from core.libs import helpers, assertions
+from core.apis.responses import APIResponse
 
 
 class Principal(db.Model):
@@ -27,17 +29,24 @@ class Principal(db.Model):
         print('get_list_of_teachers')
         return cls.query.with_entities(cls.id, cls.created_at, cls.updated_at).all()
 
-
     @classmethod
-    def submit(cls, _id, grade, auth_principal: AuthPrincipal, teacher_id):
+    def mark_grade(cls, _id, grade, auth_principal: AuthPrincipal):
         assignment = Assignment.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
-        assertions.assert_valid(assignment.state != AssignmentStateEnum.DRAFT, 'assignment is still in draft state and cannot be graded')
-        assertions.assert_valid(assignment.content is not None, 'assignment with empty content cannot be submitted')
+        assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
+        
+        if assignment.state == AssignmentStateEnum.DRAFT:
+            if assignment.teacher_id is not None:
+                assertions.assert_valid(assignment.teacher_id == auth_principal.teacher_id, 'This assignment belongs to a different teacher')
+            else:
+                assertions.assert_valid(assignment.student_id == auth_principal.student_id, 'This assignment belongs to a different student')
 
-        assignment.grade = grade
-        assignment.teacher_id = teacher_id
-        db.session.flush()
+            assignment.grade = grade
+            assignment.state = AssignmentStateEnum.GRADED
+            db.session.flush()
 
-        return assignment
+            return assignment
+        else:
+            return APIResponse.respond(status=400, message='Only draft assignments can be graded')
+
 

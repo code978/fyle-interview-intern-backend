@@ -1,4 +1,3 @@
 FAILED tests/principals_test.py::test_grade_assignment - assert 400 == 200
 FAILED tests/principals_test.py::test_regrade_assignment - assert 400 == 200
-FAILED tests/students_test.py::test_post_assignment_null_content - assert 200 == 400
-FAILED tests/SQL/sql_test.py::test_get_grade_A_assignments_for_teacher_with_max_grading - assert 2 == 1
+FAILED tests/students_test.py::test_submit_assignment_student_1 - assert 400 == 200

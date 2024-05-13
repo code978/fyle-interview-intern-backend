@@ -1,3 +1,9 @@
+from sqlalchemy.exc import IntegrityError
+from marshmallow.exceptions import ValidationError
+from werkzeug.exceptions import HTTPException
+import pytest
+from core.libs.exceptions import FyleError
+
 def test_get_assignments_student_1(client, h_student_1):
     response = client.get(
         '/student/assignments',
@@ -86,3 +92,20 @@ def test_assignment_resubmit_error(client, h_student_1):
     assert response.status_code == 400
     assert error_response['error'] == 'FyleError'
     assert error_response["message"] == 'only a draft assignment can be submitted'
+
+
+def test_ready(client):
+    response = client.get('/')
+    assert response.status_code == 200
+    assert 'status' in response.json
+    assert 'time' in response.json
+
+
+def test_ready_endpoint(client):
+    response = client.get('/')
+    
+    assert response.status_code == 200
+    assert 'status' in response.json
+    assert response.json['status'] == 'ready'
+    assert 'time' in response.json
+    # Add more assertions based on the expected response content

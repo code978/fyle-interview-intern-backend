@@ -46,19 +46,21 @@ def list_teachers(p):
 @principal_assignments_resources.route('/assignments/grade', methods=['POST'], strict_slashes=False)
 @decorators.accept_payload
 @decorators.authenticate_principal
-def submit_assignment(p, incoming_payload):
+def grade_assignment(p, incoming_payload):
+    """Grade an assignment."""
 
-  """Grade an assignment"""
+    grade_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
 
-  grade_assignment_payload = AssignmentSubmitSchema().load(incoming_payload)
+    try:
+        graded_assignment = Principal.mark_grade(
+            _id=grade_assignment_payload._id,
+            auth_principal=p,
+            grade=grade_assignment_payload.grade
+        )
+        db.session.commit()
+    except ValueError as e:
+        return APIResponse.respond(status=400, message=str(e))
 
-  graded_assignment = Principal.submit(
-      _id=grade_assignment_payload._id,
-      teacher_id=grade_assignment_payload.teacher_id,
-      auth_principal=p,
-      grade=grade_assignment_payload.grade
-  )
-  db.session.commit()
-  graded_assignment_dump = AssignmentSchema().dump(graded_assignment)
-  return APIResponse.respond(data=graded_assignment_dump)
+    graded_assignment_dump = AssignmentSchema().dump(graded_assignment)
+    return APIResponse.respond(data=graded_assignment_dump)
 
