@@ -109,3 +109,37 @@ def test_ready_endpoint(client):
     assert response.json['status'] == 'ready'
     assert 'time' in response.json
     # Add more assertions based on the expected response content
+
+def test_edit_assignment_student_2(client, h_student_2):
+    content = 'NEW CONTENT'
+
+    response = client.post(
+        '/student/assignments',
+        headers=h_student_2,
+        json={
+            'id': 5,
+            'content': content
+        })
+
+    assert response.status_code == 200
+
+    data = response.json['data']
+    assert data['content'] == content
+    assert data['state'] == 'DRAFT'
+    assert data['teacher_id'] is None
+
+def test_edit_submitted_assignment_student_1(client, h_student_1):
+    content = 'NEW CONTENT'
+
+    response = client.post(
+        '/student/assignments',
+        headers=h_student_1,
+        json={
+            'id': 1,
+            'content': content
+        })
+
+    assert response.status_code == 400
+
+    data = response.json
+    assert data['error'] == 'FyleError'

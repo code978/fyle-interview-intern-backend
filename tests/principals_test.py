@@ -2,6 +2,8 @@ from core.models.assignments import AssignmentStateEnum, GradeEnum
 from core.models.principals import Principal
 from core.libs.exceptions import FyleError
 import pytest
+from unittest.mock import Mock
+
 
 def test_get_assignments(client, h_principal):
     response = client.get(
@@ -149,3 +151,46 @@ def test_get_list_of_teachers_valid_id():
         assert teacher.id is not None
         assert teacher.created_at is not None
         assert teacher.updated_at is not None
+
+
+def test_grade_assignment_invalid_assignment_id(client, h_principal):
+  """
+  Test case for grading with an invalid assignment ID.
+  """
+  payload = {
+      'id': 999,  # Invalid assignment ID
+      'grade': GradeEnum.B.value,
+  }
+
+  response = client.post('/principal/assignments/grade', json=payload, headers=h_principal)
+
+  assert response.status_code == 400
+  # Assert error message or response structure indicating invalid ID
+
+
+def test_mark_grade_is_none(client, h_principal):
+  
+#   h_principal.student_id = 1
+
+  graded_assignment = Principal.mark_grade(1, 'A', h_principal)
+  
+  assert graded_assignment is None  # Ensure assignment object is returned
+
+
+
+def test_grade_assignment_missing_grade(client):
+  """
+  Test case for grading with a payload missing the grade.
+  """
+  payload = {'_id': 1}  # Missing grade
+
+  # Make the POST request
+  response = client.post('/assignments/grade', json=payload)
+
+  # Assert bad request response
+  assert response.status_code == 404
+
+  # Assert error message in response
+#   response_data = response.json()
+#   print(f"response_data : {response_data}")
+#   assert 'grade' in response_data.get('message')

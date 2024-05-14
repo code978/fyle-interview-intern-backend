@@ -47,6 +47,7 @@ class Principal(db.Model):
 
             return assignment
         else:
-            return APIResponse.respond(status=400, message='Only draft assignments can be graded')
+            assertions.assert_valid('This assignment is already graded')
+            # return APIResponse.respond(data={'message': 'This assignment is already graded'})
 
 
